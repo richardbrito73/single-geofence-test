@@ -15,6 +15,10 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: "[API]: Build the Docker image"
-      run: docker build ./geoapi --file Dockerfile --tag geoapp:$(date +%s)
+      run: |
+        cd geapi
+        docker build . -f Dockerfile --tag geoapi:$(date +%s)
     - name: "[APP]: Build the Docker image"
-      run: docker build ./geoapp --file Dockerfile --tag geoapp:$(date +%s)
+      run: |
+        cd geoapp
+        docker build . -f Dockerfile --tag geoapp:$(date +%s)
