@@ -16,7 +16,7 @@ jobs:
     - uses: actions/checkout@v2
     - name: "[API]: Build the Docker image"
       run: |
-        cd geapi
+        cd geoapi
         docker build . -f Dockerfile --tag geoapi:$(date +%s)
     - name: "[APP]: Build the Docker image"
       run: |
