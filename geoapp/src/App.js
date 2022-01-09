@@ -15,7 +15,6 @@ const App = () => {
     getAllTrackingPoints()
     initMap();
   }, [])
-  
   /**
    * Initialize map and draw polygon with given coordinates data.
    */
@@ -28,7 +27,6 @@ const App = () => {
       zoom: 5
     });
     setMap(_map);
-
     const _polygon = new window.google.maps.Polygon({
       paths: polygonCoords,
       strokeColor: "#FF0000",
@@ -39,6 +37,11 @@ const App = () => {
     });
     _polygon.setMap(_map);
     setPolygon(_polygon);
+    new window.google.maps.Marker({
+      position: {lat: polygonCoords[0].lat, lng: polygonCoords[0].lng},
+      _map,
+      animation: window.google.maps.Animation.BOUNCE
+    });
   }
 
   /**
@@ -81,7 +84,7 @@ const App = () => {
 
   const getAllTrackingPoints = async () => {
     try {
-      const resp = await axiosClient.get('tracking/')
+      const resp = await axiosClient.get('/tracking/')
       const data = resp.data;
       if (data && data.length > 1) {
         setMarkers(
@@ -92,15 +95,15 @@ const App = () => {
         renderMarkersOnMap()
       }
     } catch(err) {
+      console.error('Something went wrong!')
       console.error(err);
-      alert('Something went wrong!')
     }
   }
 
   const postTrakingPoint = async (data) => {
     try {
 
-      const resp = await axiosClient.post('tracking/', {
+      const resp = await axiosClient.post('/tracking/', {
         address: data.formatted_address,
         latitude: data.geometry.location.lat(),
         longitud: data.geometry.location.lng(),
@@ -108,8 +111,8 @@ const App = () => {
       });
       console.log(resp);
     } catch (err) {
+      console.error('Something went wrong!')
       console.error(err);
-      alert('Something went wrong!')
     }
   }
 
