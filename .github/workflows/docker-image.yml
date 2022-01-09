@@ -1,0 +1,20 @@
+name: Docker Image CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: "[API]: Build the Docker image"
+      run: docker build ./geoapi --file Dockerfile --tag geoapp:$(date +%s)
+    - name: "[APP]: Build the Docker image"
+      run: docker build ./geoapp --file Dockerfile --tag geoapp:$(date +%s)
