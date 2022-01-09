@@ -12,18 +12,14 @@ jobs:
     steps:
       - name: "Checkout"
       - uses: actions/checkout@v2
-      - name: "Docker Build and Deploy"
+      - name: "Docker Build and Deploy API"
       - uses: gonuit/heroku-docker-deploy@v1.3.3 # This is the action
         with:
           heroku_api_key: ${{secrets.HEROKU_API_KEY}}
           heroku_app_name: "${{secrets.HEROKU_APP_NAME}}" #Must be unique in Heroku
-          email: "${{secrets.HEROKU_EMAIL}}"
-          dockerfile_directory: ./geoapi
-          dockerfile_name: Dockerfile
-          docker_options: "--no-cache"
-          process_type: web
-          # usedocker: true
-          # appdir: geoapi
+          heroku_email: "${{secrets.HEROKU_EMAIL}}"
+          usedocker: true
+          appdir: "geoapi"
     # steps:
     #   - name: "App Deployment"
     #   - uses: actions/checkout@v2
