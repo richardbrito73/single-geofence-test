@@ -12,9 +12,11 @@ jobs:
     steps:
       - name: "Checkout"
       - uses: actions/checkout@v2
-      - name: Build the Docker image
-        run: docker build ./geoapp --file Dockerfile --tag geoapp:$(date +%s)
-      - name: "Docker Build and Deploy API"
+      - name: "[API]: Build the Docker image"
+        run: |
+          cd geoapi
+          docker build . -f Dockerfile --tag geoapi:$(date +%s)
+      - name: "[API]: Deploy"
       - uses: gonuit/heroku-docker-deploy@v1.3.3 # This is the action
         with:
           heroku_api_key: ${{secrets.HEROKU_API_KEY}}
@@ -25,9 +27,11 @@ jobs:
     steps:
       - name: "Checkout"
       - uses: actions/checkout@v2
-      - name: Build the Docker image
-        run: docker build ./geoapp --file Dockerfile --tag geoapp:$(date +%s)
-      - name: "Docker Build and Deploy React App"
+      - name: "[API]: Build the Docker image"
+        run: |
+          cd geoapi
+          docker build . -f Dockerfile --tag geoapi:$(date +%s)
+      - name: "[APP]: Deploy"
       - uses: akhileshns/heroku-deploy@v3.12.12 # This is the action
         with:
           heroku_api_key: ${{secrets.HEROKU_API_KEY}}
