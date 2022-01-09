@@ -11,13 +11,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: "Checkout"
-      - uses: actions/checkout@v2
+        uses: actions/checkout@v2
+      ## API BUILD AND DEPLOYMENT
       - name: "[API]: Build the Docker image"
         run: |
           cd geoapi
           docker build . -f Dockerfile --tag geoapi:$(date +%s)
       - name: "[API]: Deploy"
-      - uses: gonuit/heroku-docker-deploy@v1.3.3 # This is the action
+        uses: gonuit/heroku-docker-deploy@v1.3.3 # This is the action
         with:
           heroku_api_key: ${{secrets.HEROKU_API_KEY}}
           heroku_app_name: "${{secrets.HEROKU_APP_NAME}}" #Must be unique in Heroku
@@ -30,7 +31,7 @@ jobs:
           cd geoapp
           docker build . -f Dockerfile --tag geoapp:$(date +%s)
       - name: "[APP]: Deploy"
-      - uses: akhileshns/heroku-deploy@v3.12.12 # This is the action
+        uses: akhileshns/heroku-deploy@v3.12.12 # This is the action
         with:
           heroku_api_key: ${{secrets.HEROKU_API_KEY}}
           heroku_app_name: "${{secrets.HEROKU_APP_NAME}}" #Must be unique in Heroku
