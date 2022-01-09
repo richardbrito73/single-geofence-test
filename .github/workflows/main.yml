@@ -12,6 +12,8 @@ jobs:
     steps:
       - name: "Checkout"
       - uses: actions/checkout@v2
+      - name: Build the Docker image
+        run: docker build ./geoapp --file Dockerfile --tag geoapp:$(date +%s)
       - name: "Docker Build and Deploy API"
       - uses: gonuit/heroku-docker-deploy@v1.3.3 # This is the action
         with:
@@ -23,6 +25,8 @@ jobs:
     steps:
       - name: "Checkout"
       - uses: actions/checkout@v2
+      - name: Build the Docker image
+        run: docker build ./geoapp --file Dockerfile --tag geoapp:$(date +%s)
       - name: "Docker Build and Deploy React App"
       - uses: akhileshns/heroku-deploy@v3.12.12 # This is the action
         with:
