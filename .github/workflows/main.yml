@@ -12,10 +12,12 @@ jobs:
     steps:
       - name: "Checkout"
       - uses: actions/checkout@v2
+
       - name: "[API]: Build the Docker image"
         run: |
           cd geoapi
           docker build . -f Dockerfile --tag geoapi:$(date +%s)
+
       - name: "[API]: Deploy"
       - uses: gonuit/heroku-docker-deploy@v1.3.3 # This is the action
         with:
@@ -24,13 +26,12 @@ jobs:
           heroku_email: "${{secrets.HEROKU_EMAIL}}"
           usedocker: true
           appdir: "geoapi"
-    steps:
-      - name: "Checkout"
-      - uses: actions/checkout@v2
-      - name: "[API]: Build the Docker image"
+      ## APP BUILD AND DEPLOYMENT
+      - name: "[APP]: Build the Docker image"
         run: |
-          cd geoapi
-          docker build . -f Dockerfile --tag geoapi:$(date +%s)
+          cd geoapp
+          docker build . -f Dockerfile --tag geoapp:$(date +%s)
+
       - name: "[APP]: Deploy"
       - uses: akhileshns/heroku-deploy@v3.12.12 # This is the action
         with:
