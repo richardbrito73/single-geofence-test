@@ -40,12 +40,12 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
-    'corsheaders',
     'health_check',                             # required
     'health_check.db',                          # stock Django health checkers
     'health_check.cache',
     'health_check.storage',
     'health_check.contrib.migrations',
+    'corsheaders',
     # 'rest_framework_gis',
     # Local
     'api'
