@@ -1,4 +1,4 @@
-import React, {useEffect, useLayoutEffect, useState} from 'react'
+ import React, {useEffect, useLayoutEffect, useState} from 'react'
 import Autocomplete from 'react-google-autocomplete';
 import axiosClient from './config/axios';
 
@@ -14,20 +14,25 @@ const App = () => {
   const [getMarkers, setMarkers] = useState([]);
 
   useEffect(() => {
-    console.log("This should be first")
     getAllTrackingPoints();
   }, []);
   
   useEffect(() => {
-    console.log("Then this")
     initMap();
   }, []);
+
+  useEffect(() => {
+    if (getMap !== null) {
+      getPolygonCoordinates()
+    }
+  }, [getMap]);
 
   useEffect(() => {
     if (getMap !== null && getMarkers !== null) {
       renderMarkersOnMap()
     }
   }, [getMap, getMarkers]);
+
 
   useEffect(() => {
     if (selectedPlace !== null) {
@@ -47,17 +52,6 @@ const App = () => {
       zoom: 5
     });
     setMap(_map);
-
-    const polygon = new window.google.maps.Polygon({
-      paths: polygonCoords,
-      strokeColor: "#FF0000",
-      strokeOpacity: 0.5,
-      strokeWeight: 2,
-      fillColor: "#FF0000",
-      fillOpacity: 0.1,
-    });
-    polygon.setMap(_map);
-    setPolygon(polygon);
   }
 
   /**
@@ -83,6 +77,31 @@ const App = () => {
       animation: window.google.maps.Animation.BOUNCE,
     });
     newMarker.setMap(getMap);
+  }
+
+  const getPolygonCoordinates = async () => {
+    try {
+      const resp = await axiosClient.get('/polygon/')
+      const data = resp.data;
+      if (data && data.polygon) {
+        var polygonCoords = data.polygon.geometry.coordinates[0].map(coord => {
+          return {lat: coord[0], lng: coord[1]};
+        });
+        const polygon = new window.google.maps.Polygon({
+          paths: polygonCoords,
+          strokeColor: "#FF0000",
+          strokeOpacity: 0.5,
+          strokeWeight: 2,
+          fillColor: "#FF0000",
+          fillOpacity: 0.1,
+        });
+        polygon.setMap(getMap);
+        setPolygon(polygon);
+      }
+    } catch(err) {
+      console.error('Something went wrong!')
+      console.error(err);
+    }
   }
 
   const getAllTrackingPoints = async () => {

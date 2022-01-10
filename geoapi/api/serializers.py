@@ -2,6 +2,9 @@ from rest_framework import serializers
 from api.models import TrackingTrajectory
 
 
+class PolygonGeofenceSerializer(serializers.Serializer):
+    polygon = serializers.JSONField()
+
 class TrackingSerializer(serializers.Serializer):
     id = serializers.IntegerField(read_only=True)
     address = serializers.CharField()
