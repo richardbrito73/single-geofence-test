@@ -1,10 +1,9 @@
- import React, {useEffect, useLayoutEffect, useState} from 'react'
+ import React, {useEffect, useState} from 'react'
 import Autocomplete from 'react-google-autocomplete';
 import axiosClient from './config/axios';
 
 import './App.css';
 import data from './geofence.json';
-import { render } from 'react-dom';
 
 const App = () => {
 
