@@ -1,6 +1,7 @@
 # Geofence Test
 
-Run Api
+Run Api <br>
+[URL HERE](https://test-geofencing-gm-api.herokuapp.com/api/v1/tracking/)
 ```bash
 cd geoapi
 # With Pipenv
@@ -15,7 +16,8 @@ python manage.py runserver
 # DOCKER
 docker-compose up
 ```
-Run front:
+Run App: <br>
+[URL HERE](https://test-geofencing-gm.herokuapp.com)
 ```bash
 cd geoapp
 npm install
