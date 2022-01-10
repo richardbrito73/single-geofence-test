@@ -1,8 +1,5 @@
 #!/bin/sh
 
-echo "Collect static files"
-python manage.py collectstatic --noinput
-
 echo "Apply migrations"
 python manage.py makemigrations
 
@@ -11,12 +8,12 @@ python manage.py migrate
 
 echo "Starting server"
 if [ $DEBUG ]; then
-    python manage.py runserver 0.0.0.0:80
+    python manage.py runserver 0.0.0.0:$PORT
 else
     gunicorn \
         --timeout 120 \
         --access-logfile - \
-        --bind 0.0.0.0:80 \
+        --bind 0.0.0.0:$PORT \
         --workers 2 \
         pmf.wsgi:application
 fi
