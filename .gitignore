@@ -6,7 +6,7 @@ geoapi/db.sqlite3
 geoapp/node_modules
 geoapp/.pnp
 .pnp.js
-
+**/*__pycache__
 # testing
 geoapp/coverage
 
