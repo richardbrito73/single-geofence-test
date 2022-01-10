@@ -4,17 +4,37 @@ import axiosClient from './config/axios';
 
 import './App.css';
 import data from './geofence.json';
+import { render } from 'react-dom';
 
 const App = () => {
 
   const [getMap, setMap] = useState(null);
   const [getPolygon, setPolygon] = useState(null);
+  const [selectedPlace, setSelectedPlace] = useState(null);
   const [getMarkers, setMarkers] = useState([]);
 
-  useLayoutEffect(() => {
-    getAllTrackingPoints()
+  useEffect(() => {
+    console.log("This should be first")
+    getAllTrackingPoints();
+  }, []);
+  
+  useEffect(() => {
+    console.log("Then this")
     initMap();
-  }, [])
+  }, []);
+
+  useEffect(() => {
+    if (getMap !== null && getMarkers !== null) {
+      renderMarkersOnMap()
+    }
+  }, [getMap, getMarkers]);
+
+  useEffect(() => {
+    if (selectedPlace !== null) {
+      postTrakingPoint()
+    }
+  }, [selectedPlace]);
+
   /**
    * Initialize map and draw polygon with given coordinates data.
    */
@@ -27,7 +47,8 @@ const App = () => {
       zoom: 5
     });
     setMap(_map);
-    const _polygon = new window.google.maps.Polygon({
+
+    const polygon = new window.google.maps.Polygon({
       paths: polygonCoords,
       strokeColor: "#FF0000",
       strokeOpacity: 0.5,
@@ -35,52 +56,34 @@ const App = () => {
       fillColor: "#FF0000",
       fillOpacity: 0.1,
     });
-    _polygon.setMap(_map);
-    setPolygon(_polygon);
-    new window.google.maps.Marker({
-      position: {lat: polygonCoords[0].lat, lng: polygonCoords[0].lng},
-      _map,
-      animation: window.google.maps.Animation.BOUNCE
-    });
+    polygon.setMap(_map);
+    setPolygon(polygon);
   }
 
   /**
-   * Set Markers with coordinates recorded
+   * Draw Markers in the map
    */
   const renderMarkersOnMap = () => {
-    console.log(getMarkers);
-    if (getMarkers.length > 1) {
-      for(const i = 0; i <= getMarkers.length; i++) {
-        new window.google.maps.Marker({
-          position: {lat: getMarkers[i].lat, lng: getMarkers[i].lng},
-          getMap,
-          animation: window.google.maps.Animation.BOUNCE
-        });
+    if (getMarkers.length > 0) {
+      for(let i = 0; i < getMarkers.length; i++) {
+        addMarker({
+          lat: getMarkers[i].lat,
+          lng: getMarkers[i].lng,
+          geofence: getMarkers[i].geofence
+        })
       }
     }
   }
-  
-  const onPlaceSelected = (place) => {
-    const newCoords = {
-      lat: place.geometry.location.lat(),
-      lng: place.geometry.location.lng(),
-    }
-    debugger;
-    setMarkers([...getMarkers, {lat: newCoords.lat, lng: newCoords.lng}]);
-    renderMarkersOnMap()
-    //debugger;
-    const contains = window.google.maps.geometry.poly.containsLocation(
-      new window.google.maps.LatLng(newCoords.lat, newCoords.lng),
-      getPolygon
-      );
-      
-    postTrakingPoint({...place, geofence: contains ? true : false})
-    alert(
-      contains 
-      ? `[${newCoords.lat}, ${newCoords.lng}]: IN`
-      : `[${newCoords.lat}, ${newCoords.lng}]: OUT`
-    )
-  };
+
+  const addMarker = (marker) => {
+    let newMarker = new window.google.maps.Marker({
+      position: {lat: marker.lat, lng: marker.lng},
+      label: marker.geofence ? 'IN' : 'OUT',
+      map: getMap,
+      animation: window.google.maps.Animation.BOUNCE,
+    });
+    newMarker.setMap(getMap);
+  }
 
   const getAllTrackingPoints = async () => {
     try {
@@ -89,10 +92,14 @@ const App = () => {
       if (data && data.length > 1) {
         setMarkers(
           data.map(item => {
-            return {lat: item.latitude, lng: item.longitude}
+            return {
+              lat: item.latitude,
+              lng: item.longitude,
+              geofence: item.geofence
+            }
           })
         );
-        renderMarkersOnMap()
+        renderMarkersOnMap();
       }
     } catch(err) {
       console.error('Something went wrong!')
@@ -100,37 +107,51 @@ const App = () => {
     }
   }
 
-  const postTrakingPoint = async (data) => {
+  const postTrakingPoint = async () => {
     try {
+      const place = selectedPlace;
+      const latitude = place.geometry.location.lat();
+      const longitude = place.geometry.location.lng();
+      const isInPolygon = window.google.maps.geometry.poly.containsLocation(
+        new window.google.maps.LatLng(latitude, longitude),
+        getPolygon
+      );
 
-      const resp = await axiosClient.post('/tracking/', {
-        address: data.formatted_address,
-        latitude: data.geometry.location.lat(),
-        longitud: data.geometry.location.lng(),
-        geofence: data.geofence
+      await axiosClient.post('/tracking/', {
+        address: place.formatted_address,
+        latitude,
+        longitude,
+        geofence: isInPolygon
       });
-      console.log(resp);
+
+      addMarker({
+        lat: latitude,
+        lng: longitude,
+        geofence: isInPolygon
+      })
+  
     } catch (err) {
       console.error('Something went wrong!')
       console.error(err);
     }
   }
 
+  const onPlaceSelected = (place) => {
+    setSelectedPlace(place);
+  };
+
 
   return (
     <div className="App">
-      {/* className={classes.autocomplete} */}
-        <div className="App-header">
-          {/* apiKey={process.env.REACT_APP_GMAP_API_KEY} */}
+      <div className="App-header">
         <Autocomplete
           onPlaceSelected={onPlaceSelected}
           options={{
             types: ["geocode", "establishment"],
           }}
           libraries={["geometry", "places"]}
-
         />
-        </div>
+      </div>
       <div id="map" style={{width:'100%', height:'100vh'}}></div>
     </div>
   );
