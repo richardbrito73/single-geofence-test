@@ -23,4 +23,4 @@ cd geoapp
 npm install
 npm start
 ```
-`Please, check the .env files to know the variables that need to be set up in both projects.`
+`Please, check the .env files to know the variables that need to be set up in both projects...`
